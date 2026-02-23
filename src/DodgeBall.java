@@ -91,8 +91,23 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 	}
 
 	private void moveAllBallsOnce() {
-		for(GOval ball:balls) {
-			ball.move(SPEED, 0);
+		for (int i = balls.size() - 1; i >= 0; i--) {
+			GOval ball = balls.get(i);
+			
+			double checkX = ball.getX() + SIZE + 1;
+			double checkY = ball.getY() + SIZE / 2;
+			
+			GObject obj = getElementAt(checkX, checkY);
+			
+			if (obj instanceof GRect) {
+				remove(obj);
+				enemies.remove(obj);
+				remove(ball);
+				balls.remove(i);
+			}
+			else {
+				ball.move(SPEED, 0);
+			}
 		}
 	}
 	
