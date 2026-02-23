@@ -27,7 +27,10 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 	public static final int WINDOW_HEIGHT = 600;
 	public static final int WINDOW_WIDTH = 300;
 	
-	private int numTimes;
+	private int numTimes = 0;
+	private int enemiesDestroyed = 0;
+	private GLabel destroyedLabel;
+	private GLabel timeLabel;
 	
 	public void run() {
 		rgen = RandomGenerator.getInstance();
@@ -37,7 +40,11 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 		numTimes = 0;
 		
 		text = new GLabel(""+enemies.size(), 0, WINDOW_HEIGHT);
+		destroyedLabel = new GLabel("Destroyed: 0", 10, 20);
+		timeLabel = new GLabel("Time: 0", 10, 40);
 		add(text);
+		add(destroyedLabel);
+		add(timeLabel);
 		
 		movement = new Timer(MS, this);
 		movement.start();
@@ -46,11 +53,16 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		numTimes++;
+		timeLabel.setLabel("Time: " + numTimes);
 		moveAllBallsOnce();
 		moveAllEnemiesOnce();
 		
 		if (numTimes % 40 == 0) {
 			addAnEnemy();
+		}
+		
+		if (enemies.size() > MAX_ENEMIES) {
+			loseGame();
 		}
 	}
 	
@@ -104,6 +116,8 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 				enemies.remove(obj);
 				remove(ball);
 				balls.remove(i);
+				enemiesDestroyed++;
+				destroyedLabel.setLabel("Destroyed: " + enemiesDestroyed);
 			}
 			else {
 				ball.move(SPEED, 0);
@@ -115,6 +129,20 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 		for (GRect enemy : enemies) {
 			enemy.move(0,  rgen.nextInt(-2, 2));
 		}
+	}
+	
+	private void loseGame() {
+	    movement.stop();
+	    removeAll();
+
+	    GLabel lose = new GLabel("You lost", 80, WINDOW_HEIGHT / 2);
+	    lose.setFont("SansSerif-24");
+
+	    GLabel score = new GLabel("Survival Time: " + numTimes, 60, WINDOW_HEIGHT / 2 + 40);
+	    score.setFont("SansSerif-18");
+
+	    add(lose);
+	    add(score);
 	}
 	
 	public void init() {
